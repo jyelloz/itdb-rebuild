@@ -75,6 +75,13 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
             return default
 
     def action(path):
+
+        from os import sep
+        from os.path import relpath
+
+        relative_path = relpath(path, mountpoint)
+        ipod_path = relative_path.replace(sep, ':')
+
         md = get_metadata(path)
         c = is_compilation(md)
         if c:
@@ -86,7 +93,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         track.artist = get_first(md, 'artist')
         track.album = get_first(md, 'album')
         track.compilation = c
-        # track.ipod_path = gpod.itdb_resolve_path(db, [str(path)])
+        track.ipod_path = ipod_path
 
         try:
             track_number = get_first(md, 'tracknumber')
