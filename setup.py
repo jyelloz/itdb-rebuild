@@ -14,7 +14,7 @@ setup(
     description=_description,
     long_description=_description,
     platforms='any',
-    packages=['itdb_rebuild'],
+    py_modules=['itdb_rebuild'],
     entry_points={
         'console_scripts': [
             'itdb-rebuild = itdb_rebuild:main',
