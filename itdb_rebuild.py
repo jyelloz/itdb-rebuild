@@ -88,12 +88,11 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
 
     def store_artwork(artwork_data, mb_albumid):
 
-        import gio
-        from gtk import gdk
+        from gi.repository import Gio, GdkPixbuf
 
-        artwork_in = gio.memory_input_stream_new_from_data(artwork_data)
+        artwork_in = Gio.MemoryInputStream.new_from_data(artwork_data)
 
-        pixbuf = gdk.pixbuf_new_from_stream(
+        artwork_pixbuf = GdkPixbuf.Pixbuf.new_from_stream(
             artwork_in,
             None,
         )
@@ -102,7 +101,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
 
         gpod.itdb_artwork_set_thumbnail_from_pixbuf(
             artwork,
-            pixbuf,
+            artwork_pixbuf,
             0,
             None,
         )
