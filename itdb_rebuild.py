@@ -76,7 +76,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
 
     def action(path):
 
-        from os import sep
+        from os import sep, stat
         from os.path import relpath
 
         from mutagen.m4a import M4AInfo
@@ -100,6 +100,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         track.bitrate = int(info.bitrate)
         track.samplerate = int(info.sample_rate)
         track.ipod_path = ipod_path
+        track.size = stat(path).st_size
         if isinstance(info, M4AInfo):
             track.filetype = 'M4A-file'
         else:
