@@ -83,6 +83,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         ipod_path = relative_path.replace(sep, ':')
 
         md = get_metadata(path)
+        info = md.info
         c = is_compilation(md)
         if c:
             compilation_albums.add(get_first(md, 'album'))
@@ -93,6 +94,9 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         track.artist = get_first(md, 'artist')
         track.album = get_first(md, 'album')
         track.compilation = c
+        track.tracklen = int(info.length * 1000)
+        track.bitrate = int(info.bitrate)
+        track.samplerate = int(info.sample_rate)
         track.ipod_path = ipod_path
 
         try:
