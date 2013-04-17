@@ -82,7 +82,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         from mutagen.m4a import M4AInfo
 
         relative_path = relpath(path, mountpoint)
-        ipod_path = relative_path.replace(sep, ':')
+        ipod_path = ':' + relative_path.replace(sep, ':')
 
         md = get_metadata(path)
         info = md.info
