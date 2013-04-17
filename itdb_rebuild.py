@@ -79,6 +79,8 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         from os import sep
         from os.path import relpath
 
+        from mutagen.m4a import M4AInfo
+
         relative_path = relpath(path, mountpoint)
         ipod_path = relative_path.replace(sep, ':')
 
@@ -98,6 +100,10 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         track.bitrate = int(info.bitrate)
         track.samplerate = int(info.sample_rate)
         track.ipod_path = ipod_path
+        if isinstance(info, M4AInfo):
+            track.filetype = 'M4A-file'
+        else:
+            track.filetype = 'MP3-file'
 
         try:
             track_number = get_first(md, 'tracknumber')
