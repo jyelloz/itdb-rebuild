@@ -7,7 +7,7 @@ _description = 'Rebuild iTunesDB with libgpod',
 setup(
     name='ItdbRebuild',
     version='0.1.0',
-    license='MIT Apache BSD',
+    license='MIT BSD Apache',
     url='https://jordan.yelloz.me/',
     author='Jordan Yelloz',
     author_email='jordan@yelloz.me',
