@@ -218,7 +218,7 @@ def main():
     parser.add_argument(
         '-L',
         '--ipod-name',
-        default='Joes iPod',
+        default='iPod',
     )
 
     parser.add_argument(
