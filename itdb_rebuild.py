@@ -66,8 +66,6 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
     gpod.itdb_playlist_set_mpl(master)
     gpod.itdb_playlist_add(db, master, -1)
 
-    compilation_albums = set()
-
     def get_first(d, key, default=None):
         try:
             return d.get(key)[0].encode('utf-8')
@@ -87,8 +85,6 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         md = get_metadata(path)
         info = md.info
         c = is_compilation(md)
-        if c:
-            compilation_albums.add(get_first(md, 'album'))
 
         track = gpod.itdb_track_new()
 
