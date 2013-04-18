@@ -45,21 +45,13 @@ def is_compilation(md_easy):
     except:
         pass
 
-    performer = md_easy.get('performer')
-    albumartist = md_easy.get('albumartist')
-    artist = md_easy.get('artist')
-
-    if performer is not None and artist is not None:
-        return performer[0] != artist[0]
-
-    if albumartist is not None and artist is not None:
-        return artist[0] != albumartist[0]
-
     try:
         album_type = get_first(md_easy, 'musicbrainz_albumtype')
         return album_type == u'soundtrack' or album_type == u'compilation'
     except:
-        return False
+        pass
+
+    return False
 
 
 def find_files(music_directory, action=None):
