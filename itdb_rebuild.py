@@ -200,6 +200,19 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
     _log.info('done')
 
 
+def rebuild_artwork(mountpoint, dry_run=True):
+
+    from collections import defaultdict
+
+    db = gpod.itdb_parse(mountpoint)
+
+    album_tracks = defaultdict(set)
+    album_artwork = dict()
+
+    def add_track(album_id, track):
+        album_tracks.get(album_id, set).add(track)
+
+
 def main():
 
     from argparse import ArgumentParser
@@ -228,5 +241,30 @@ def main():
     rebuild(
         mountpoint=args.mountpoint,
         ipod_name=args.ipod_name,
+        dry_run=args.dry_run
+    )
+
+
+def main_artwork():
+
+    from argparse import ArgumentParser
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        '-n',
+        '--dry-run',
+        action='store_true',
+    )
+
+    parser.add_argument(
+        'mountpoint'
+    )
+
+    args = parser.parse_args()
+    rebuild_artwork(
+        mountpoint=args.mountpoint,
         dry_run=args.dry_run
     )
