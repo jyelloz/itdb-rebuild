@@ -226,7 +226,7 @@ def rebuild_artwork(mountpoint, dry_run=True):
             album_artwork = mbid_album_artwork
         elif artist is not None and album is not None:
             if compilation:
-                album_id = ('compilation', album)
+                album_id = (('compilation',), album)
             else:
                 album_id = (artist, album)
             album_tracks = non_mbid_album_tracks
