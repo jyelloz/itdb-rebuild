@@ -206,19 +206,37 @@ def rebuild_artwork(mountpoint, dry_run=True):
 
     db = gpod.Database(mountpoint)
 
-    album_tracks = defaultdict(set)
-    album_artwork = dict()
+    mbid_album_tracks = defaultdict(set)
+    mbid_album_artwork = dict()
+
+    non_mbid_album_tracks = defaultdict(set)
+    non_mbid_album_artwork = dict()
 
     for track in db:
         md_hard, md_easy = get_metadata(track.ipod_filename())
 
         mb_albumid = get_first(md_easy, 'musicbrainz_albumid', None)
-        if mb_albumid is None:
+        artist = get_first(md_easy, 'artist', None)
+        album = get_first(md_easy, 'album', None)
+        compilation = is_compilation(md_easy)
+
+        if mb_albumid is not None:
+            album_id = mb_albumid
+            album_tracks = mbid_album_tracks
+            album_artwork = mbid_album_artwork
+        elif artist is not None and album is not None:
+            if compilation:
+                album_id = ('compilation', album)
+            else:
+                album_id = (artist, album)
+            album_tracks = non_mbid_album_tracks
+            album_artwork = non_mbid_album_artwork
+        else:
             continue
 
-        album_tracks[mb_albumid].add(track)
+        album_tracks[album_id].add(track)
 
-        if mb_albumid in album_artwork:
+        if album_id in album_artwork:
             continue
 
         artwork_data = get_any_artwork(md_hard)
@@ -228,30 +246,34 @@ def rebuild_artwork(mountpoint, dry_run=True):
 
         _log.debug('loaded artwork from track %r', track)
 
-        album_artwork[mb_albumid] = artwork_data
+        album_artwork[album_id] = artwork_data
 
-    for mb_albumid, artwork_data in album_artwork.iteritems():
+    for album_tracks, album_artwork in [
+        (mbid_album_tracks, mbid_album_artwork),
+        (non_mbid_album_tracks, non_mbid_album_artwork),
+    ]:
+        for album_id, artwork_data in album_artwork.iteritems():
 
-        import gio
-        from gtk import gdk
+            import gio
+            from gtk import gdk
 
-        artwork_in = gio.memory_input_stream_new_from_data(artwork_data)
+            artwork_in = gio.memory_input_stream_new_from_data(artwork_data)
 
-        pixbuf = gdk.pixbuf_new_from_stream(
-            artwork_in,
-            None,
-        )
+            pixbuf = gdk.pixbuf_new_from_stream(
+                artwork_in,
+                None,
+            )
 
-        tracks = album_tracks[mb_albumid]
+            tracks = album_tracks[album_id]
 
-        _log.debug(
-            'setting artwork on %d tracks of album %r',
-            len(tracks),
-            mb_albumid,
-        )
+            _log.debug(
+                'setting artwork on %d tracks of album %r',
+                len(tracks),
+                album_id,
+            )
 
-        for track in tracks:
-            track.set_coverart(pixbuf)
+            for track in tracks:
+                track.set_coverart(pixbuf)
 
     if dry_run:
         _log.info('dry run, quitting')
