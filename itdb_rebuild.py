@@ -11,7 +11,14 @@ def get_metadata(path):
 
 def get_first(d, key, default=None):
     try:
-        return d.get(key)[0].encode('utf-8')
+        return d.get(key)[0]
+    except:
+        return default
+
+
+def get_first_utf8(d, key, default=None):
+    try:
+        return get_first(d, key, default).encode('utf-8')
     except:
         return default
 
@@ -46,7 +53,7 @@ def is_compilation(md_easy):
         pass
 
     try:
-        album_type = get_first(md_easy, 'musicbrainz_albumtype')
+        album_type = get_first_utf8(md_easy, 'musicbrainz_albumtype')
         return album_type == u'soundtrack' or album_type == u'compilation'
     except:
         pass
@@ -122,9 +129,9 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
 
         track = gpod.itdb_track_new()
 
-        track.title = get_first(md_easy, 'title')
-        track.artist = get_first(md_easy, 'artist')
-        track.album = get_first(md_easy, 'album')
+        track.title = get_first_utf8(md_easy, 'title')
+        track.artist = get_first_utf8(md_easy, 'artist')
+        track.album = get_first_utf8(md_easy, 'album')
         track.compilation = c
         track.tracklen = int(info.length * 1000)
         track.bitrate = int(info.bitrate)
@@ -137,7 +144,7 @@ def rebuild(mountpoint, ipod_name, dry_run=True):
         else:
             track.filetype = 'MP3-file'
 
-        mb_albumid = get_first(md_easy, 'musicbrainz_albumid', None)
+        mb_albumid = get_first_utf8(md_easy, 'musicbrainz_albumid', None)
         if mb_albumid is not None:
 
             existing_artwork = get_artwork(mb_albumid)
