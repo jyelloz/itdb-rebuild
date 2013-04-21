@@ -18,6 +18,7 @@ setup(
     entry_points={
         'console_scripts': [
             'itdb-rebuild = itdb_rebuild:main',
+            'itdb-rebuild-artwork = itdb_rebuild:main_artwork',
         ],
     },
     install_requires=[
