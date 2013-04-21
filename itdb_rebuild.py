@@ -204,13 +204,62 @@ def rebuild_artwork(mountpoint, dry_run=True):
 
     from collections import defaultdict
 
-    db = gpod.itdb_parse(mountpoint)
+    db = gpod.Database(mountpoint)
 
     album_tracks = defaultdict(set)
     album_artwork = dict()
 
-    def add_track(album_id, track):
-        album_tracks.get(album_id, set).add(track)
+    for track in db:
+        md_hard, md_easy = get_metadata(track.ipod_filename())
+
+        mb_albumid = get_first(md_easy, 'musicbrainz_albumid', None)
+        if mb_albumid is None:
+            continue
+
+        album_tracks[mb_albumid].add(track)
+
+        if mb_albumid in album_artwork:
+            continue
+
+        artwork_data = get_any_artwork(md_hard)
+
+        if artwork_data is None:
+            continue
+
+        _log.debug('loaded artwork from track %r', track)
+
+        album_artwork[mb_albumid] = artwork_data
+
+    for mb_albumid, artwork_data in album_artwork.iteritems():
+
+        import gio
+        from gtk import gdk
+
+        artwork_in = gio.memory_input_stream_new_from_data(artwork_data)
+
+        pixbuf = gdk.pixbuf_new_from_stream(
+            artwork_in,
+            None,
+        )
+
+        tracks = album_tracks[mb_albumid]
+
+        _log.debug(
+            'setting artwork on %d tracks of album %r',
+            len(tracks),
+            mb_albumid,
+        )
+
+        for track in tracks:
+            track.set_coverart(pixbuf)
+
+    if dry_run:
+        _log.info('dry run, quitting')
+        return
+
+    _log.info('saving itunesdb')
+    db.close()
+    _log.info('done')
 
 
 def main():
